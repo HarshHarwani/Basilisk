@@ -21,27 +21,32 @@ font=pygame.font.SysFont(None,25)
 #this function takes a message and displays it to the screen.
 def message(message,color):
     screen_text=font.render(message,True,color)
-    gameDisplay.blit(screen_text,[display_width/2,display_height/2])
-
-def snake(snake_block_size,snakeList):
+    gameDisplay.blit(screen_text,[display_width/4,display_height/2])
+#this funtion defines draws all elements of the snake,the elements are there in the sankeList
+def snake(snake_block_size,snakeList):  
         for element in snakeList:
              pygame.draw.rect(gameDisplay,green,[element[0],element[1],snake_block_size,snake_block_size])
 
+# Main Game Loop
 def gameLoop():
     gameExit=False
     gameOver=False
+    crashedInto=False
     lead_x=display_width/2
     lead_y=display_height/2
     x_change=0
     y_change=0
-    x_apple=round(random.randrange(0,display_width-snake_block_size)/10.0)*10.0
-    y_apple=round(random.randrange(0,display_height-snake_block_size)/10.0)*10.0
+    x_apple=round(random.randrange(0,display_width-snake_block_size))
+    y_apple=round(random.randrange(0,display_height-snake_block_size))
     snakeList=[]
     snakeLength=1
     while not gameExit:
         while gameOver is True:
             gameDisplay.fill(white)
-            message("Game Over,Press C to play again or q to quit",red)
+            if not crashedInto:
+                message("Game Over,Press C to play again or q to quit",red)
+            if crashedInto:
+                message("You crashed into yourself Broooo..!!,Press C to play again or q to quit",red)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type==pygame.KEYDOWN:
@@ -81,14 +86,19 @@ def gameLoop():
         for element in snakeList[:-1]:
             if element==snakeHead:
                 gameOver=True
+                crashedInto=True
         snake(snake_block_size,snakeList)
         pygame.display.update()
-        if lead_x==x_apple and lead_y==y_apple:
-            x_apple=round(random.randrange(0,display_width-snake_block_size)/10.0)*10.0
-            y_apple=round(random.randrange(0,display_height-snake_block_size)/10.0)*10.0
-            snakeLength+=1
+##        if lead_x>=x_apple and lead_x<=x_apple+snake_block_size:
+##             if lead_y>=y_apple and lead_y<=y_apple+snake_block_size:
+
+        
+        if lead_x>=x_apple and lead_x<x_apple+snake_block_size or lead_x+snake_block_size>x_apple and lead_x+snake_block_size<x_apple+snake_block_size:
+            if lead_y>=y_apple and lead_y<y_apple+snake_block_size or lead_y+snake_block_size>y_apple and lead_y+snake_block_size<y_apple+snake_block_size:
+                x_apple=round(random.randrange(0,display_width-snake_block_size))
+                y_apple=round(random.randrange(0,display_height-snake_block_size))
+                snakeLength+=1
         clock.tick(FPS) 
     pygame.quit()
     quit()
-
 gameLoop()
