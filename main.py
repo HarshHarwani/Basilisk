@@ -8,10 +8,11 @@ white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
 green=(0,155,0)
+gold=(255,215,0)
 display_width=800
 display_height=600
 gameDisplay=pygame.display.set_mode((display_width,display_height))
-pygame.display.set_caption('Basilisk')
+pygame.display.set_caption('Snake Byte')
 img=pygame.image.load ('snake.png')
 apple_img=pygame.image.load('apple.png')
 apple_block_size=30
@@ -20,7 +21,7 @@ direction="right"
 FPS=15
 small=pygame.font.SysFont("comicsansms",25)
 medium=pygame.font.SysFont("comicsansms",40)
-large=pygame.font.SysFont("comicsansms",80)
+large=pygame.font.SysFont("comicsansms",70)
 #this function returns the textSurface and rectange of the textSurface on which actual text is written.
 def text_objects(text,color,size):
     if size=='small':
@@ -71,16 +72,20 @@ def start_screen():
                 if event.key==pygame.K_c:
                     gameStart=False
         gameDisplay.fill(white)
-        message("Welcome to Basilisk",green,-100,"large")
-        message("Eat Harry and grow stronger",black,-30)
+        message("Welcome to Snake Byte",green,-100,"large")
+        message("Byte Apple and grow stronger",black,-30)
         message("If you run into yourself or the walls, You will die",black,10)
-        message("Use arrow keys to control Basilisk",black,50)
+        message("Use arrow keys to control snake",black,50)
         message("Press C to play again or q to quit",black,140,size='medium')
         pygame.display.update()
         clock.tick(15)
 # Main Game Loop
 def gameLoop():
     global direction
+    goingLeft=False
+    goingRight=False
+    goingUp=False
+    goingDown=False
     direction="right"
     gameExit=False
     gameOver=False
@@ -116,27 +121,42 @@ def gameLoop():
                 gameExit=True
             if event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_LEFT:
-                    x_change=-snake_block_size
-                    y_change=0
-                    direction='left'
+                    goingLeft=True
+                    goingUp=False
+                    goingDown=False
+                    if not goingRight:
+                        x_change=-snake_block_size
+                        y_change=0
+                        direction='left'
                 elif event.key==pygame.K_RIGHT:
-                    x_change=snake_block_size
-                    y_change=0
-                    direction='right'
+                    goingRight=True
+                    goingUp=False
+                    goingDown=False
+                    if not goingLeft:
+                        x_change=snake_block_size
+                        y_change=0
+                        direction='right'
                 elif event.key==pygame.K_UP:
-                    y_change=-snake_block_size
-                    x_change=0
-                    direction='up'
+                    goingUp=True
+                    goingLeft=False
+                    goingRight=False
+                    if not goingDown:
+                        y_change=-snake_block_size
+                        x_change=0
+                        direction='up'
                 elif event.key==pygame.K_DOWN:
-                    y_change=snake_block_size
-                    x_change=0
-                    direction='down'
+                    goingDown=True
+                    goingLeft=False
+                    goingRight=False
+                    if not goingUp:
+                        y_change=snake_block_size
+                        x_change=0
+                        direction='down'
         if lead_x>=display_width or lead_x<0 or lead_y>=display_height or lead_y<0:
             gameOver=True
         lead_x+=x_change
         lead_y+=y_change
         gameDisplay.fill(white)
-        #pygame.draw.rect(gameDisplay,red,[x_apple,y_apple,apple_block_size,apple_block_size])
         gameDisplay.blit(apple_img,(x_apple,y_apple))
         score(gameScore)
         snakeHead=[]
