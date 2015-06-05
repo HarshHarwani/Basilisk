@@ -13,7 +13,7 @@ display_width=800
 display_height=600
 gameDisplay=pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Snake Byte')
-img=pygame.image.load ('snake.png')
+img=pygame.image.load('snake.png')
 apple_img=pygame.image.load('apple.png')
 apple_block_size=30
 snake_block_size=20
@@ -22,6 +22,7 @@ FPS=15
 small=pygame.font.SysFont("comicsansms",25)
 medium=pygame.font.SysFont("comicsansms",40)
 large=pygame.font.SysFont("comicsansms",70)
+
 #this function returns the textSurface and rectange of the textSurface on which actual text is written.
 def text_objects(text,color,size):
     if size=='small':
@@ -44,6 +45,19 @@ def message(message,color,y_displace=0,size="small"):
     textSurf,textRect=text_objects(message,color,size)
     textRect.center=(display_width/2,display_height/2+y_displace)
     gameDisplay.blit(textSurf,textRect)
+
+
+#this function detects the intersection of the apple and snake
+def detectAppleIntersection(lead_x,x_apple,lead_y,y_apple,snake_block_size,apple_block_size):
+    if lead_x>=x_apple and lead_x<x_apple+apple_block_size or lead_x+snake_block_size>x_apple and lead_x+snake_block_size<x_apple+apple_block_size:
+            if lead_y>=y_apple and lead_y<y_apple+apple_block_size or lead_y+snake_block_size>y_apple and lead_y+snake_block_size<y_apple+apple_block_size:
+                return True
+
+#this function generate apples and returns the x,y co-ordinates of the generated apple
+def generateApples(display_width,apple_block_size):
+        x_apple=round(random.randrange(0,display_width-apple_block_size))
+        y_apple=round(random.randrange(0,display_height-apple_block_size))
+        return x_apple,y_apple
     
 #this funtion defines draws all elements of the snake,the elements are there in the sankeList
 def snake(snake_block_size,snakeList):
@@ -58,6 +72,8 @@ def snake(snake_block_size,snakeList):
         gameDisplay.blit(head,(snakeList[-1][0],snakeList[-1][1]))
         for element in snakeList[:-1]:
              pygame.draw.rect(gameDisplay,green,[element[0],element[1],snake_block_size,snake_block_size])
+
+#this function draws the start screen of the game.
 def start_screen():
     gameStart=True;                
     while gameStart:
@@ -79,6 +95,7 @@ def start_screen():
         message("Press C to play again or q to quit",black,140,size='medium')
         pygame.display.update()
         clock.tick(15)
+
 # Main Game Loop
 def gameLoop():
     global direction
@@ -87,15 +104,14 @@ def gameLoop():
     goingUp=False
     goingDown=False
     direction="right"
-    gameExit=False
+    globals gameExit=False
     gameOver=False
     crashedInto=False
     lead_x=display_width/2
     lead_y=display_height/2
     x_change=10
     y_change=0
-    x_apple=round(random.randrange(0,display_width-apple_block_size))
-    y_apple=round(random.randrange(0,display_height-apple_block_size))
+    x_apple,y_apple=generateApples(display_width,apple_block_size)
     gameScore=0
     snakeList=[]
     snakeLength=1
@@ -171,10 +187,8 @@ def gameLoop():
                 crashedInto=True
         snake(snake_block_size,snakeList)
         pygame.display.update()
-        if lead_x>=x_apple and lead_x<x_apple+apple_block_size or lead_x+snake_block_size>x_apple and lead_x+snake_block_size<x_apple+apple_block_size:
-            if lead_y>=y_apple and lead_y<y_apple+apple_block_size or lead_y+snake_block_size>y_apple and lead_y+snake_block_size<y_apple+apple_block_size:
-                x_apple=round(random.randrange(0,display_width-apple_block_size))
-                y_apple=round(random.randrange(0,display_height-apple_block_size))
+        if detectAppleIntersection(lead_x,x_apple,lead_y,y_apple,snake_block_size,apple_block_size):
+                x_apple,y_apple=generateApples(display_width,apple_block_size)
                 snakeLength+=1
                 gameScore+=10
                 score(gameScore)        
